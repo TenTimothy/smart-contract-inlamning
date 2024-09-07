@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import "solidity-coverage";
 
 describe("MovieVoting", function () {
   let MovieVoting;
