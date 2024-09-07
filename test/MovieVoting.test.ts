@@ -9,11 +9,9 @@ describe("MovieVoting", function () {
   let addr2: any;
 
   beforeEach(async function () {
-    
     MovieVoting = await ethers.getContractFactory("MovieVoting");
-    [owner, addr1, addr2] = await ethers.getSigners(); 
-    movieVoting = await MovieVoting.deploy(); 
-    await movieVoting.deployed();
+    [owner, addr1, addr2] = await ethers.getSigners();
+    movieVoting = await MovieVoting.deploy();
   });
 
   it("Ska sätta rätt ägare", async function () {
@@ -24,17 +22,14 @@ describe("MovieVoting", function () {
     const movieList = ["Inception", "Titanic", "Interstellar"];
     await movieVoting.createPoll(movieList);
     const poll = await movieVoting.polls(1);
-
     expect(poll.creator).to.equal(owner.address);
   });
 
   it("Ska starta omröstningen", async function () {
     const movieList = ["Inception", "Titanic", "Interstellar"];
     await movieVoting.createPoll(movieList);
-
     await movieVoting.startVoting(1);
     const poll = await movieVoting.polls(1);
-
     expect(poll.state).to.equal(1); 
   });
 
@@ -42,13 +37,14 @@ describe("MovieVoting", function () {
     const movieList = ["Inception", "Titanic", "Interstellar"];
     await movieVoting.createPoll(movieList);
     await movieVoting.startVoting(1);
-
-    
+  
+   
+    const signers = await ethers.getSigners();
+  
     for (let i = 0; i < 8; i++) {
-      const voter = i % 2 === 0 ? addr1 : addr2; 
-      await movieVoting.connect(voter).vote(1, "Inception");
+      await movieVoting.connect(signers[i]).vote(1, "Inception");
     }
-
+  
     const poll = await movieVoting.polls(1);
     expect(poll.state).to.equal(2); 
     expect(poll.winner).to.equal("Inception");
@@ -59,8 +55,11 @@ describe("MovieVoting", function () {
     await movieVoting.createPoll(movieList);
     await movieVoting.startVoting(1);
 
+  
     await movieVoting.connect(addr1).vote(1, "Inception");
 
-    await expect(movieVoting.connect(addr1).vote(1, "Inception")).to.be.revertedWith("AlreadyVoted");
+    await expect(
+      movieVoting.connect(addr1).vote(1, "Inception")
+    ).to.be.revertedWithCustomError(movieVoting, "AlreadyVoted");
   });
 });
