@@ -80,7 +80,7 @@ contract MovieVoting {
         emit VotingStarted(_pollId); 
     }
 
-    // Funktion för att lägga en röst på en film i en pågående omröstning 
+    // Funktion för att lägga en röst på en film i pågående omröstning 
     function vote(uint _pollId, string memory _movieTitle) public inState(_pollId, VotingState.Ongoing) {
         Poll storage poll = polls[_pollId];
 
